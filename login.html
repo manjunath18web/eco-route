@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="{{ url_for('static', filename='language.js') }}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRoute Explorer | Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="initial-state" id="mainBody">
+
+    <div class="bg-layer polluted-bg" id="pollutedLayer" onclick="startTransition()">
+        <div class="smoke-overlay"></div>
+        <div class="intro-text">EcoRoute</div>
+        <div class="tap-hint">Click anywhere to enter a greener world</div>
+    </div>
+    <div class="bg-layer green-bg" id="greenLayer"></div>
+
+    <div class="container">
+        <div class="card hidden" id="selectionCard">
+            <div class="brand-icon"><i class="fas fa-leaf"></i></div>
+            <h1>EcoRoute <span>Explorer</span></h1>
+            <p>Our planet is struggling. Choose your role to find a cleaner path.</p>
+            
+            <div class="role-grid">
+                <button type="button" class="entry-btn user-btn" onclick="showLoginForm('user')">
+                    <i class="fas fa-user"></i> <span>User Login</span>
+                </button>
+                <button type="button" class="entry-btn admin-btn" onclick="showLoginForm('admin')">
+                    <i class="fas fa-user-shield"></i> <span>Admin Access</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="card hidden" id="loginCard">
+            <div class="card-header">
+                <h1 id="formHeader">User <span>Login</span></h1>
+                <p>Enter your credentials to continue</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for msg in messages %}
+                    <div class="flash-msg"><i class="fas fa-exclamation-circle"></i> {{ msg }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="/login" method="post">
+                <input type="hidden" name="role" id="loginRole" value="user">
+                
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="text" name="username" placeholder="Username / Email" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Password" required>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span>Authorize</span>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </form>
+
+            <div class="card-footer">
+                <div class="signup">New explorer? <a href="/register">Create Account</a></div>
+                <div class="forgot" style="margin-top: 10px;"><a href="/forgot" style="color: #65a30d; text-decoration: none; font-size: 0.9rem;"><i class="fas fa-key"></i> Forgot Password?</a></div>
+                <button class="back-link" onclick="hideLoginForm()"><i class="fas fa-arrow-left"></i> Back to Roles</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startTransition() {
+            const body = document.getElementById('mainBody');
+            const selectionCard = document.getElementById('selectionCard');
+            body.classList.remove('initial-state');
+            body.classList.add('green-state');
+            setTimeout(() => {
+                selectionCard.classList.remove('hidden');
+                selectionCard.style.opacity = "1";
+            }, 800);
+        }
+
+        function showLoginForm(role) {
+            document.getElementById('loginRole').value = role;
+            document.getElementById('formHeader').innerHTML = role.charAt(0).toUpperCase() + role.slice(1) + " <span>Login</span>";
+            document.getElementById('selectionCard').classList.add('hidden');
+            const loginCard = document.getElementById('loginCard');
+            loginCard.classList.remove('hidden');
+            setTimeout(() => loginCard.style.opacity = "1", 10);
+        }
+
+        function hideLoginForm() {
+            document.getElementById('loginCard').classList.add('hidden');
+            document.getElementById('selectionCard').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

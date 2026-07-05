@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="{{ url_for('static', filename='language.js') }}"></script>
+    <title>EcoRoute | Search</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Hide Google Translate UI Elements to keep the dashboard clean */
+        #google_translate_element, .skiptranslate {
+            display: none !important;
+        }
+        body {
+            top: 0px !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="google_translate_element"></div>
+
+    <div id="map"></div>
+    <div class="top-dashboard">
+        <a href="{{ url_for('history') }}" class="history-btn" title="View Travel History">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </a>
+
+        <h1 class="main-title">EcoRoute - Carbon Efficient Route Finder</h1>
+        <div class="controls-row">
+            <div class="input-group">
+                <div class="start-container">
+                    <input type="text" id="start-city" placeholder="Start Location" class="nav-input" autocomplete="off" oninput="fetchCities('start-city', 'start-suggestions')">
+                    <button class="loc-btn" onclick="getCurrentLocation()">📍</button>
+                </div>
+                <div id="start-suggestions" class="suggestions"></div>
+            </div>
+            <div class="input-group">
+                <input type="text" id="end-city" placeholder="Destination City" class="nav-input" autocomplete="off" oninput="fetchCities('end-city', 'end-suggestions')">
+                <div id="end-suggestions" class="suggestions"></div>
+            </div>
+            <select id="vehicle" class="nav-select">
+                <option value="car">🚗 Car</option>
+                <option value="bike">🏍️ Bike</option>
+                <option value="bus">🚌 Bus</option>
+                <option value="truck">🚛 Truck</option>
+            </select>
+            <button class="clear-btn" onclick="clearInputs()">Clear</button>
+            <button class="calc-btn" onclick="calculateAndMove()">Eco Route</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <script type="text/javascript">
+        /**
+         * Google Translate Initialization
+         */
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        /**
+         * Autofill Logic for History Re-runs
+         * Listens for the 'load' event to check if a re-run was triggered from the history page
+         */
+        window.addEventListener('load', function() {
+            const autoRun = localStorage.getItem("autoRun");
+            const ecoData = JSON.parse(localStorage.getItem("ecoData"));
+            
+            if (autoRun === "true" && ecoData) {
+                // Populate the input fields with the historical data
+                document.getElementById('start-city').value = ecoData.start;
+                document.getElementById('end-city').value = ecoData.end;
+                document.getElementById('vehicle').value = ecoData.vehicle;
+                
+                // Remove the flag to prevent automatic re-runs on manual refreshes
+                localStorage.removeItem("autoRun");
+                
+                // Allow the Leaflet map and script.js a moment to initialize before calculating
+                setTimeout(() => {
+                    if (typeof calculateAndMove === "function") {
+                        calculateAndMove();
+                    }
+                }, 600);
+            }
+        });
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
+</body>
+</html>

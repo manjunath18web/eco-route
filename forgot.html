@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EcoRoute | Reset Password</title>
+    <script src="{{ url_for('static', filename='language.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Hide Google Translate UI Elements to keep the custom design clean */
+        #google_translate_element, .skiptranslate {
+            display: none !important;
+        }
+        body {
+            top: 0px !important;
+        }
+    </style>
+</head>
+<body class="green-state">
+
+    <div class="bg-layer green-bg" style="opacity: 1; background-image: url('{{ url_for('static', filename='green.jpg') }}'); background-size: cover; background-position: center; position: fixed; width: 100vw; height: 100vh; z-index: -1;"></div>
+
+    <div id="google_translate_element"></div>
+
+    <div class="container">
+        <div class="card" style="opacity: 1; display: block; max-width: 400px; margin: auto;">
+            <div class="brand-icon"><i class="fas fa-leaf"></i></div>
+            <h1>Reset <span>Password</span></h1>
+            <p>Verify your identity to secure your explorer profile</p>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div style="margin-bottom: 15px;">
+                  {% for msg in messages %}
+                    <div class="flash-msg" style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:5px; color: #fff; font-size: 0.9rem; text-align: left;">
+                      {{ msg }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            {% if not otp_sent %}
+            <form method="POST">
+                <input type="hidden" name="request_otp" value="1">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="username" placeholder="Enter Registered Gmail ID" required autocomplete="email">
+                </div>
+                <button type="submit" class="submit-btn">
+                    <span>Send OTP</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+            {% else %}
+            <form method="POST" onsubmit="return checkPasswordMatch()">
+                <input type="hidden" name="verify_otp" value="1">
+                
+                <div class="input-group" style="margin-bottom: 12px;">
+                    <i class="fas fa-key"></i>
+                    <input type="text" name="otp" placeholder="Enter 6-Digit OTP Code" required autocomplete="off">
+                </div>
+                
+                <div class="input-group" style="margin-bottom: 12px;">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="new_password" name="new_password" placeholder="New Password" required>
+                </div>
+                
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <i class="fas fa-check-double"></i>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span>Update Password</span>
+                    <i class="fas fa-save"></i>
+                </button>
+            </form>
+            {% endif %}
+
+            <div class="card-footer" style="margin-top: 20px;">
+                <div class="signup"><a href="/"><i class="fas fa-arrow-left"></i> Back to Login</a></div>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    // Frontend validation to prevent typo submission
+    function checkPasswordMatch() {
+        const pass = document.getElementById("new_password").value;
+        const confirmPass = document.getElementById("confirm_password").value;
+        if (pass !== confirmPass) {
+            alert("❌ New Password and Confirm Password do not match! Please verify fields.");
+            return false;
+        }
+        return true;
+    }
+
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+
+    // Auto-apply saved language from Login Page
+    window.addEventListener('load', function() {
+        const savedLang = localStorage.getItem('selectedLang');
+        if (savedLang && savedLang !== 'en') {
+            setTimeout(() => {
+                const googleCombo = document.querySelector("select.goog-te-combo");
+                if (googleCombo) {
+                    googleCombo.value = savedLang;
+                    googleCombo.dispatchEvent(new Event('change'));
+                }
+            }, 1000);
+        }
+    });
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="{{ url_for('static', filename='language.js') }}"></script>
+    <meta charset="UTF-8">
+    <title>Travel History | EcoRoute</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Ensuring the history page has a scrollable background */
+        body {
+            overflow: auto !important;
+            padding: 40px 20px;
+        }
+        /* Style for the action button */
+        .re-run-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .re-run-btn:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="history-card">
+        <a href="{{ url_for('index') }}" class="back-btn">← Back to Map</a>
+        <h1 class="main-title" style="text-align: left; margin-bottom: 30px;">Your Travel History</h1>
+        
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Vehicle</th>
+                    <th>Date & Time</th>
+                    <th>Action</th> 
+                </tr>
+            </thead>
+            <tbody>
+                {% for travel in travels %}
+                <tr>
+                    <td>{{ travel['start_loc'] }}</td>
+                    <td>{{ travel['dest_loc'] }}</td>
+                    <td>{{ travel['vehicle']|capitalize }}</td>
+                    <td>{{ travel['timestamp'] }}</td>
+                    <td>
+                        <button class="re-run-btn" onclick="reRunRoute('{{ travel['start_loc'] }}', '{{ travel['dest_loc'] }}', '{{ travel['vehicle'] }}')">
+                            Re-run
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">
+                        No travel history found. Start exploring to see your routes here!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        /**
+         * Re-run a specific route from history
+         * Saves trip data to localStorage and flags an automatic run for index.html
+         */
+        function reRunRoute(start, end, vehicle) {
+            const data = { 
+                start: start, 
+                end: end, 
+                vehicle: vehicle 
+            };
+            
+            // Save selection to memory so index.html can read it
+            localStorage.setItem("ecoData", JSON.stringify(data));
+            
+            // Set a flag to tell index.html to automatically trigger the route calculation
+            localStorage.setItem("autoRun", "true");
+            
+            // Redirect to the main search page (index)
+            window.location.href = "{{ url_for('index') }}";
+        }
+    </script>
+</body>
+</html>
